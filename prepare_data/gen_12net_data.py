@@ -26,7 +26,7 @@ f3 = open(os.path.join(save_dir, 'part_12.txt'), 'w')
 with open(anno_file, 'r') as f:
     annotations = f.readlines()
 num = len(annotations)
-print "%d pics in total" % num
+print("%d pics in total" % num)
 p_idx = 0 # positive
 n_idx = 0 # negative
 d_idx = 0 # dont care
@@ -37,14 +37,14 @@ for annotation in annotations:
     #image path
     im_path = annotation[0]
     #boxed change to float type
-    bbox = map(float, annotation[1:])
+    bbox = list(map(float, annotation[1:]))
     #gt
     boxes = np.array(bbox, dtype=np.float32).reshape(-1, 4)
     #load image
     img = cv2.imread(os.path.join(im_dir, im_path + '.jpg'))
     idx += 1
     if idx % 100 == 0:
-        print idx, "images done"
+        print("%d images done" % idx)
         
     height, width, channel = img.shape
 
@@ -145,7 +145,7 @@ for annotation in annotations:
                 cv2.imwrite(save_file, resized_im)
                 d_idx += 1
         box_idx += 1
-	print "%s images done, pos: %s part: %s neg: %s"%(idx, p_idx, d_idx, n_idx)
+print("%s images done, pos: %s part: %s neg: %s" % idx, p_idx, d_idx, n_idx)
 f1.close()
 f2.close()
 f3.close()
