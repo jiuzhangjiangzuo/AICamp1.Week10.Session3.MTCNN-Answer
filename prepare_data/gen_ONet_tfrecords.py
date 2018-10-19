@@ -3,6 +3,7 @@ import os
 import random
 import sys
 import time
+import argparse
 
 import tensorflow as tf
 
@@ -24,17 +25,9 @@ def _add_to_tfrecord(filename, image_example, tfrecord_writer):
     #image_example dict contains image's info
     image_data, height, width = _process_image_withoutcoder(filename)
     example = _convert_to_example_simple(image_example, image_data)
-    tfrecord_writer.write(example.SerializeToString())
+    tfrecord_writer.write(example.SerializeToString()) 
 
-
-def _get_output_filename(output_dir, name, net):
-    #st = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    #return '%s/%s_%s_%s.tfrecord' % (output_dir, name, net, st)
-    #return '%s/train_PNet_landmark.tfrecord' % (output_dir)
-    return '%s/landmark_landmark.tfrecord' % (output_dir)
-    
-
-def run(dataset_dir, net, output_dir, name='MTCNN', shuffling=False):
+def run(dataset_dir, net, output_dir, input_file, name='MTCNN', shuffling=False):
     """Runs the conversion operation.
 
     Args:
@@ -43,12 +36,12 @@ def run(dataset_dir, net, output_dir, name='MTCNN', shuffling=False):
     """
     
     #tfrecord name 
-    tf_filename = _get_output_filename(output_dir, name, net)
+    tf_filename = output_dir
     if tf.gfile.Exists(tf_filename):
         print('Dataset files already exist. Exiting without re-creating them.')
         return
     # GET Dataset, and shuffling.
-    dataset = get_dataset(dataset_dir, net=net)
+    dataset = get_dataset(dataset_dir, input_file, net=net)
     # filenames = dataset['filename']
     if shuffling:
         tf_filename = tf_filename + '_shuffle'
@@ -56,7 +49,6 @@ def run(dataset_dir, net, output_dir, name='MTCNN', shuffling=False):
         random.shuffle(dataset)
     # Process dataset files.
     # write the data to tfrecord
-    print 'lala'
     with tf.python_io.TFRecordWriter(tf_filename) as tfrecord_writer:
         for i, image_example in enumerate(dataset):
             sys.stdout.write('\r>> Converting image %d/%d' % (i + 1, len(dataset)))
@@ -70,11 +62,10 @@ def run(dataset_dir, net, output_dir, name='MTCNN', shuffling=False):
     print('\nFinished converting the MTCNN dataset!')
 
 
-def get_dataset(dir, net='PNet'):
+def get_dataset(dir, input_file, net):
     #item = 'imglists/PNet/train_%s_raw.txt' % net
     #item = 'imglists/PNet/train_%s_landmark.txt' % net
-    item = '%s/landmark_%s_aug.txt' % (net,net)
-    print item 
+    item = input_file
     dataset_dir = os.path.join(dir, item)
     imagelist = open(dataset_dir, 'r')
 
@@ -121,9 +112,18 @@ def get_dataset(dir, net='PNet'):
 
     return dataset
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='Test mtcnn',
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--input_file', dest='input_file', help='input file name', type=str)
+    parser.add_argument('--output_file', dest='output_file', help='output file name', type=str)
+    args = parser.parse_args()
+    return args
+
 
 if __name__ == '__main__':
+    args = parse_args()
     dir = '.' 
     net = '48'
-    output_directory = 'imglists/ONet'
-    run(dir, net, output_directory, shuffling=True)
+    output_directory = os.path.join('imglists/ONet', args.output_file)
+    run(dir, net, output_directory, args.input_file, shuffling=True)

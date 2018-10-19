@@ -5,7 +5,6 @@ import os
 from datetime import datetime
 import sys
 sys.path.append("../prepare_data")
-print sys.path
 from read_tfrecord_v2 import read_multi_tfrecords,read_single_tfrecord
 from MTCNN_config import config
 from mtcnn_model import P_Net
@@ -34,27 +33,7 @@ def train_model(base_lr, loss, data_num):
     train_op = optimizer.minimize(loss, global_step)
 
     return train_op, lr_op
-'''
-certain samples mirror
-def random_flip_images(image_batch,label_batch,landmark_batch):
-    num_images = image_batch.shape[0]
-    random_number = npr.choice([0,1],num_images,replace=True)
-    #the index of image needed to flip
-    indexes = np.where(random_number>0)[0]
-    fliplandmarkindexes = np.where(label_batch[indexes]==-2)[0]
-    
-    #random flip    
-    for i in indexes:
-        cv2.flip(image_batch[i],1,image_batch[i])
-    #pay attention: flip landmark    
-    for i in fliplandmarkindexes:
-        landmark_ = landmark_batch[i].reshape((-1,2))
-        landmark_ = np.asarray([(1-x, y) for (x, y) in landmark_])
-        landmark_[[0, 1]] = landmark_[[1, 0]]#left eye<->right eye
-        landmark_[[3, 4]] = landmark_[[4, 3]]#left mouth<->right mouth        
-        landmark_batch[i] = landmark_.ravel()
-    return image_batch,landmark_batch
-'''
+
 # all mini-batch mirror
 def random_flip_images(image_batch,label_batch,landmark_batch):
     #mirror
@@ -94,17 +73,14 @@ def train(net_factory, prefix, end_epoch, base_dir,
     #label file
     label_file = os.path.join(base_dir,'train_%s_landmark.txt' % net)
     #label_file = os.path.join(base_dir,'landmark_12_few.txt')
-    print label_file 
     f = open(label_file, 'r')
     num = len(f.readlines())
     print("Total datasets is: ", num)
-    print prefix
 
     #PNet use this method to get data
     if net == 'PNet':
         #dataset_dir = os.path.join(base_dir,'train_%s_ALL.tfrecord_shuffle' % net)
         dataset_dir = os.path.join(base_dir,'train_%s_landmark.tfrecord_shuffle' % net)
-        print dataset_dir
         image_batch, label_batch, bbox_batch,landmark_batch = read_single_tfrecord(dataset_dir, config.BATCH_SIZE, net)
         
     #RNet use 3 tfrecords to get data    
@@ -169,6 +145,7 @@ def train(net_factory, prefix, end_epoch, base_dir,
     i = 0
     #total steps
     MAX_STEP = int(num / config.BATCH_SIZE + 1) * end_epoch
+    print("Train steps: %d" % MAX_STEP)
     epoch = 0
     sess.graph.finalize()    
     try:

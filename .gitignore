@@ -113,5 +113,9 @@ dmypy.json
 **/.DS_Store
 
 prepare_data/12/
+prepare_data/24/
+prepare_data/48/
+prepare_data/imglists/
 prepare_data/WIDER_train/
 prepare_data/lfw_5590/
+logs/

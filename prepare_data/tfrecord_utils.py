@@ -153,7 +153,6 @@ def _process_image(filename, coder):
     # image_data = sess.run(tf.cast(resized_image, tf.uint8)).tobytes()
     # image = Image.open(filename)  # 图片的类型必须为array
     filename = filename + '.jpg'
-    print filename
     image = cv2.imread(filename)
     # image.show()
     # image_data = image.tobytes()

@@ -4,6 +4,12 @@ from tensorflow.contrib import slim
 import numpy as np
 num_keep_radio = 0.7
 
+def prelu(inputs):
+    alphas = tf.get_variable("alphas", shape=inputs.get_shape()[-1], dtype=tf.float32, initializer=tf.constant_initializer(0.25))
+    pos = tf.nn.relu(inputs)
+    neg = alphas * (inputs-abs(inputs))*0.5
+    return pos + neg
+
 def dense_to_one_hot(labels_dense,num_classes):
     num_labels = labels_dense.shape[0]
     index_offset = np.arange(num_labels)*num_classes
