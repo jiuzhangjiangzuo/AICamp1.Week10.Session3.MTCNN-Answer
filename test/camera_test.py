@@ -41,7 +41,6 @@ while True:
         image = np.array(frame)
         boxes_c,landmarks = mtcnn_detector.detect(image)
         
-        print landmarks.shape
         t2 = cv2.getTickCount()
         t = (t2 - t1) / cv2.getTickFrequency()
         fps = 1.0 / t
@@ -57,14 +56,14 @@ while True:
         cv2.putText(frame, '{:.4f}'.format(t) + " " + '{:.3f}'.format(fps), (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                     (255, 0, 255), 2)
         for i in range(landmarks.shape[0]):
-            for j in range(len(landmarks[i])/2):
+            for j in range(len(landmarks[i])//2):
                 cv2.circle(frame, (int(landmarks[i][2*j]),int(int(landmarks[i][2*j+1]))), 2, (0,0,255))            
         # time end
         cv2.imshow("", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     else:
-        print 'device not find'
+        print('device not find')
         break
 video_capture.release()
 cv2.destroyAllWindows()
