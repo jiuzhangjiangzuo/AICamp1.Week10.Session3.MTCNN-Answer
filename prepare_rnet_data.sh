@@ -2,9 +2,9 @@
 
 cd prepare_data
 
-#python3 gen_hard_example.py --test_mode=PNet
+python3 gen_hard_example.py --test_mode=PNet
 
-#python3 gen_landmark_aug_24.py
+python3 gen_landmark_aug_24.py
 
 python3 gen_imglist_rnet.py
 

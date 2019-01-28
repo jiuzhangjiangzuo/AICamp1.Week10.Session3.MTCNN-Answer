@@ -2,7 +2,7 @@
 
 cd prepare_data
 
-# python3 gen_hard_example.py --test_mode=RNet
+python3 gen_hard_example.py --test_mode=RNet
 
 python3 gen_landmark_aug_48.py
 
